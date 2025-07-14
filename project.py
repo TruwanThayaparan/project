@@ -115,9 +115,9 @@ def flight_details():
     if ac not in aircrafts: # check if it exists
         print("That is not a valid type of aircraft.")
         return None, None
-    else:
-        idx = [ac] + aircrafts[ac]
-        #print(idx)
+    
+    #idx = [ac] + aircrafts[ac]
+    #print(idx)
 
     information = ("running cost per seat per 100 km: " + str(aircrafts[ac][0]) + "\n" +
            "maximum flight range (km): " + str(aircrafts[ac][1]) + "\n" +
@@ -169,14 +169,14 @@ def calculate_profit_pp():
     # enter prices for standard class and first-class seats
     while True:
         try:
-            sc_seat = float(int("Enter price for standard-class seat: "))
+            sc_seat_price = float(input("Enter price for standard-class seat: "))
             break
         except:
             print("You must enter a number.")
 
     while True:
         try:
-            sc_seat = float(int("Enter price for first-class seat: "))
+            fc_seat_price = float(input("Enter price for first-class seat: "))
             break
         except:
             print("You must enter a number.")
