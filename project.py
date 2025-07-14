@@ -51,17 +51,22 @@ aircraft = None
 first_class_seats = None
 dist_between = None
 
-# get the details from the csv
-with open('Airports.txt', newline='') as csvfile:
-    spamreader = csv.reader(csvfile, delimiter=',')
-    for row in spamreader:
-        airport_codes.append(row[0])
-        airport_names.append(row[1])
-        distance_from_liverpool.append(int(row[2]))
-        distance_from_bournemouth.append(int(row[3]))
+# get the details from the csv (if it exists)
+try:
+    with open('Airports.txt', newline='') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=',')
+        for row in spamreader:
+            airport_codes.append(row[0])
+            airport_names.append(row[1])
+            distance_from_liverpool.append(int(row[2]))
+            distance_from_bournemouth.append(int(row[3]))
+except FileNotFoundError:
+    print("The Airports.txt file is missing!")
+    return
 
 # main menu
 def menu():
+    global uk_code, abroad_code, dist_between, aircraft, first_class_seats
     while True:
         print("\nSelect an option:")
         print("1. Enter airport details")
@@ -76,7 +81,7 @@ def menu():
         elif option in ("enter price plan and calculate profit", "3"):
             t = calculate_profit_pp()
         elif option in ("clear data", "4"):
-            uk_code, abroad_code, aircraft, first_class_seats, dist_between = None
+            uk_code, abroad_code, aircraft, first_class_seats, dist_between = None, None, None, None, None
             print("Data has been cleared!")
         else:
             print("That is not a valid option!")
@@ -87,11 +92,11 @@ def airport_details():
     apcu = input("Enter the three-letter airport code (UK): ").upper().strip()
     if apcu not in ("LPL", "BOH"):
         print("That is not a valid three-letter code.")
-        return None, None
-
+        return None, None, None
+    
     # enter airport code abroad (apca)
     apca = input("Enter the three-letter airport code (ABROAD): ").upper().strip()
-    for p in airport_codes: # check if it's valid
+    for p in airport_codes:  # check if it's valid
         if apca == p:
             idx = airport_codes.index(p)
             print(airport_names[idx])
@@ -101,11 +106,12 @@ def airport_details():
             else:
                 length = distance_from_bournemouth[idx]
 
-            print(length)
-            return apcu, apca, length
+            # print(f"Distance between {apcu} and {apca}: {length} km")
+            return apcu, apca, length 
+              
+    print("No airport found with that code.")
+    return None, None, None
 
-    print("A airport could not be found with this code.")
-    return None, None
 
 # enter flight details
 def flight_details():
