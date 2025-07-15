@@ -52,20 +52,26 @@ aircraft = None
 first_class_seats = None
 standard_class_seats = None
 
-airport_loaded = True
-# get the details from the csv (if it exists)
+# load the csv and catch errors
+airport_loaded = False  
+
 try:
     with open('Airports.txt', newline='') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',')
-        for row in spamreader:
-            airport_codes.append(row[0])
-            airport_names.append(row[1])
-            distance_from_liverpool.append(int(row[2]))
-            distance_from_bournemouth.append(int(row[3]))
+        for row_num, row in enumerate(spamreader, start=1):
+            if len(row) != 4:
+                raise ValueError(f"Row {row_num} does not contain exactly 4 values: {row}")
+            airport_codes.append(row[0].strip())
+            airport_names.append(row[1].strip())
+            distance_from_liverpool.append(int(row[2].strip()))
+            distance_from_bournemouth.append(int(row[3].strip()))
+        airport_loaded = True
 except FileNotFoundError:
-    print("The Airports.txt file is missing!")
-    airport_loaded = False
-
+    print("Error: The Airports.txt file is missing!")
+except ValueError as ve:
+    print(f"Value error in Airports.txt: {ve}")
+except Exception as e:
+    print(f"Unexpected issue in Airports.txt file: {e}")
 
 # main menu
 def menu():
@@ -93,7 +99,7 @@ def menu():
             print("The program has ended.")
             break
         else:
-            print("That is not a valid option!")
+            print("Error: That is not a valid option!")
 
 
 # enter airport details
@@ -101,7 +107,7 @@ def airport_details():
     # enter airport code UK (apcu)
     apcu = input("\nEnter the three-letter airport code (UK): ").upper().strip()
     if apcu not in valid_uk_codes:
-        print("That is not a valid three-letter code.")
+        print("Error: That is not a valid three-letter code.")
         return None, None, None
     
     # enter airport code abroad (apca)
@@ -119,7 +125,7 @@ def airport_details():
             print(f"Distance between {apcu} and {apca}: {length} km")
             return apcu, apca, length 
               
-    print("No airport could be found with that code.")
+    print("Error: No airport could be found with that code.")
     return None, None, None
 
 
@@ -129,7 +135,7 @@ def flight_details():
     ac = input("\nEnter the type of aircraft that will be used: ").lower().strip()
 
     if ac not in aircrafts: # check if it exists
-        print("That is not a valid type of aircraft.")
+        print("Error: That is not a valid type of aircraft.")
         return None, None, None
     
     #idx = [ac] + aircrafts[ac]
@@ -148,25 +154,25 @@ def flight_details():
             fc_seats = int(input("Enter the number of first-class seats: "))
             break
         except ValueError:
-            print("You must enter an integer.")
+            print("Error: You must enter an integer.")
 
     # check for issues
     if fc_seats != 0:
         if fc_seats < aircrafts[ac][3]:
-            print("Number of first-class seats must not be less than minimum number of first-class seats!")
+            print("Error: Number of first-class seats must not be less than minimum number of first-class seats!")
             return None, None, None
         if fc_seats > (aircrafts[ac][2] / 2):
-            print("Number of first-seats seats must not be greater than half the capacity if all seats are standard-class!")
+            print("Error: Number of first-seats seats must not be greater than half the capacity if all seats are standard-class!")
             return None, None, None
 
     if fc_seats < 0:
-        print("First-class seats cannot be negative.")
+        print("Error: First-class seats cannot be negative.")
         return None, None, None
     
     # calculate number of standard-class seats on aircraft
     sc_seats = aircrafts[ac][2] - fc_seats * 2
     if sc_seats < 0:
-         print("Too many first-class seats specified. Not enough remaining seat capacity.")
+         print("Error: Too many first-class seats specified. Not enough remaining seat capacity.")
          return None, None, None
     
     print(f"Number of standard class seats: {sc_seats}")
@@ -180,19 +186,19 @@ def flight_details():
 def calculate_profit_pp():
     # check if all details entered
     if uk_code == None or abroad_code == None:
-        print("Airport details have not been entered yet (missing airport codes).")
+        print("Error: Airport details have not been entered yet (missing airport codes).")
         return None
     if aircraft == None:
-        print("Flight details have not been entered yet (missing aircraft).")
+        print("Error: Flight details have not been entered yet (missing aircraft).")
         return None
     if first_class_seats == None:
-        print("Flight details have not been entered yet (missing number of first class seats).")
+        print("Error: Flight details have not been entered yet (missing number of first class seats).")
         return None
 
     if aircrafts[aircraft][1] >= dist_between: 
         pass
     else:
-        print("Distance between airports exceeds maximum flight range for this aircraft.")
+        print("Error: Distance between airports exceeds maximum flight range for this aircraft.")
         return None
 
     print("\n")
@@ -202,15 +208,20 @@ def calculate_profit_pp():
             sc_seat_price = float(input("Enter price for standard-class seat (£): "))
             break
         except ValueError:
-            print("You must enter a number.")
+            print("Error: You must enter a number.")
 
     while True:
         try:
             fc_seat_price = float(input("Enter price for first-class seat (£): "))
             break
         except ValueError:
-            print("You must enter a number.")
+            print("Error: You must enter a number.")
 
+    # negative check
+    if sc_seat_price < 0 or fc_seat_price < 0:
+          print("Error: Seat prices cannot be negative.")
+          return None
+          
     # calculate variables
     flight_cost_per_seat = aircrafts[aircraft][0] * (dist_between / 100)
     flight_cost = flight_cost_per_seat * (first_class_seats + standard_class_seats)
@@ -228,5 +239,5 @@ def calculate_profit_pp():
     return
 
 # start
-if airport_loaded:
+if airport_loaded == True:
       menu()
