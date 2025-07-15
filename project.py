@@ -52,6 +52,7 @@ aircraft = None
 first_class_seats = None
 standard_class_seats = None
 
+airport_loaded = True
 # get the details from the csv (if it exists)
 try:
     with open('Airports.txt', newline='') as csvfile:
@@ -63,7 +64,7 @@ try:
             distance_from_bournemouth.append(int(row[3]))
 except FileNotFoundError:
     print("The Airports.txt file is missing!")
-    exit()
+    airport_loaded = False
 
 
 # main menu
@@ -227,4 +228,5 @@ def calculate_profit_pp():
     return
 
 # start
-menu()
+if airport_loaded:
+      menu()
