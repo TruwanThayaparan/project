@@ -84,7 +84,7 @@ def menu():
         print("2. Enter flight details")
         print("3. Enter price plan and calculate profit")
         print("4. Clear data")
-        print("5. Exit")
+        print("5. Quit")
         option = input().lower().strip()
         if option in ("enter airport details", "1"):
             uk_code, abroad_code, dist_between = airport_details()
@@ -95,7 +95,7 @@ def menu():
         elif option in ("clear data", "4"):
             uk_code, abroad_code, dist_between, aircraft, first_class_seats, standard_class_seats = None, None, None, None, None, None
             print("Data has been cleared! You may now re-enter new airport and flight information.")
-        elif option in ("exit", "close", "5"):
+        elif option in ("quit", "exit", "close", "5"):
             print("The program has ended.")
             break
         else:
