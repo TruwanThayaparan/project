@@ -107,7 +107,7 @@ def airport_details():
     # enter airport code UK (apcu)
     apcu = input("\nEnter the three-letter airport code (UK): ").upper().strip()
     if apcu not in valid_uk_codes:
-        print("Error: That is not a valid three-letter code.")
+        print("Error: That is not a valid three-letter code (only LPL and BOH are accepted).")
         return None, None, None
     
     # enter airport code abroad (apca)
